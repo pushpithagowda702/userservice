@@ -33,25 +33,19 @@ public class UserService {
     public UserResponse register(@Valid RegisterRequest request) {
         if(userRepo.existsByEmail(request.getEmail())) {
             User existingUser = userRepo.findByEmail(request.getEmail());
-            UserResponse response = new UserResponse();
-            response.setId(existingUser.getId());
-            response.setKeycloakId(existingUser.getKeycloakId());
-            response.setEmail(existingUser.getEmail());
-            response.setPassword(existingUser.getPassword());
-            response.setFirstName(existingUser.getFirstName());
-            response.setLastName(existingUser.getLastName());
-            response.setCreatedAt(existingUser.getCreatedAt());
-            response.setUpdatedAt(existingUser.getUpdatedAt());
-            return response;
+            return formatResponse(existingUser);
         }
-
         User user = new User();
         user.setEmail(request.getEmail());
         user.setPassword(request.getPassword());
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
-
+        user.setKeycloakId(request.getKeycloakId());
         User savedUser = userRepo.save(user);
+        return formatResponse(savedUser);
+    }
+
+    private UserResponse formatResponse(User savedUser) {
         UserResponse response = new UserResponse();
         response.setId(savedUser.getId());
         response.setEmail(savedUser.getEmail());
